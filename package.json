@@ -4,12 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js"
   },
   "author": "YvonneK",
   "license": "ISC",
   "dependencies": {
     "@prisma/client": "^5.12.1",
+    "express": "^4.19.2",
     "Express": "^3.0.1"
   },
   "devDependencies": {
