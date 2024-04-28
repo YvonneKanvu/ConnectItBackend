@@ -1,0 +1,111 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+model Prestataire{
+  Id Int @unique
+  Nom String
+  PreNom String
+  Adesse String
+  Email String
+  Telephone String
+  Geolocalisation Geolocalisation @relation(fields: [GeolocalisationId],references: [Id])
+  GeolocalisationId Int
+  Secteur String
+  Fournir Fournir[]
+  DemandeDeDevis DemandeDeDevis[]
+  AvisEtRecommandention AvisEtRecommandention[]
+  Message Message[]
+  Intervention Intervention[]
+  Appartenir Appartenir[]
+}
+model Geolocalisation{
+  Id Int @unique
+  Adresse String
+  Laltitude String
+  Longitude String
+  Prestataire Prestataire[]
+}
+model Utilisateur{
+  Id Int @unique
+  Nom String
+  PreNom String
+  Email String
+  Telephone String
+  Fournir Fournir[]
+  DemandeDeDevis DemandeDeDevis[]
+  AvisEtRecommandention AvisEtRecommandention[]
+  Message Message[]
+  Intervention Intervention[]
+}
+model Fournir{
+  Id Int @unique
+  Prestataire Prestataire? @relation(fields: [PrestataireId],references: [Id])
+  PrestataireId Int?
+  Utilisateur Utilisateur? @relation(fields: [UtilisateurId],references: [Id])
+  UtilisateurId Int?
+}
+model DemandeDeDevis{
+  Id Int @unique
+  TypeDeService String
+  Statut String
+  Date DateTime
+  Prestataire Prestataire? @relation(fields: [PrestataireId],references: [Id])
+  PrestataireId Int?
+  Utilisateur Utilisateur? @relation(fields: [UtilisateurId],references: [Id])
+  UtilisateurId Int?
+}
+model AvisEtRecommandention{
+  Id Int @unique
+  Note String
+  Commentaire String
+  Date DateTime
+  Prestataire Prestataire? @relation(fields: [PrestataireId],references: [Id])
+  PrestataireId Int?
+  Utilisateur Utilisateur? @relation(fields: [UtilisateurId],references: [Id])
+  UtilisateurId Int?
+}
+model Message{
+  Id Int @unique
+  Expediteur String
+  Destinataire String
+  Contenu String
+  Statut String
+  Date DateTime
+  Prestataire Prestataire? @relation(fields: [PrestataireId],references: [Id])
+  PrestataireId Int?
+  Utilisateur Utilisateur? @relation(fields: [UtilisateurId],references: [Id])
+  UtilisateurId Int?
+}
+model Intervention{
+  Id Int @unique
+  Description String
+  Statut String
+  Date DateTime
+  Prestataire Prestataire? @relation(fields: [PrestataireId],references: [Id])
+  PrestataireId Int?
+  Utilisateur Utilisateur? @relation(fields: [UtilisateurId],references: [Id])
+  UtilisateurId Int?
+}
+model Secteur{
+  Id Int @unique
+  Designation String 
+  Appartenir Appartenir[]
+}
+model Appartenir{
+  Id Int @unique
+  Prestataire Prestataire? @relation(fields: [PrestataireId],references: [Id])
+  PrestataireId Int?
+  Secteur Secteur? @relation(fields: [SecteurId],references: [Id])
+  SecteurId Int?
+}
