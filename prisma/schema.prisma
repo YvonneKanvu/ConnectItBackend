@@ -13,7 +13,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 model Prestataire{
-  Id Int @unique
+  Id Int @unique @default(autoincrement())
   Nom String
   PreNom String
   Adesse String
@@ -22,6 +22,7 @@ model Prestataire{
   Geolocalisation Geolocalisation @relation(fields: [GeolocalisationId],references: [Id])
   GeolocalisationId Int
   Secteur String
+  NomDeL_entreprise String
   Fournir Fournir[]
   DemandeDeDevis DemandeDeDevis[]
   AvisEtRecommandention AvisEtRecommandention[]
@@ -30,14 +31,14 @@ model Prestataire{
   Appartenir Appartenir[]
 }
 model Geolocalisation{
-  Id Int @unique
+  Id Int @unique @default(autoincrement())
   Adresse String
   Laltitude String
   Longitude String
   Prestataire Prestataire[]
 }
 model Utilisateur{
-  Id Int @unique
+  Id Int @unique @default(autoincrement())
   Nom String
   PreNom String
   Email String
@@ -49,14 +50,14 @@ model Utilisateur{
   Intervention Intervention[]
 }
 model Fournir{
-  Id Int @unique
+  Id Int @unique @default(autoincrement())
   Prestataire Prestataire? @relation(fields: [PrestataireId],references: [Id])
   PrestataireId Int?
   Utilisateur Utilisateur? @relation(fields: [UtilisateurId],references: [Id])
   UtilisateurId Int?
 }
 model DemandeDeDevis{
-  Id Int @unique
+  Id Int @unique @default(autoincrement())
   TypeDeService String
   Statut String
   Date DateTime
@@ -66,7 +67,7 @@ model DemandeDeDevis{
   UtilisateurId Int?
 }
 model AvisEtRecommandention{
-  Id Int @unique
+  Id Int @unique @default(autoincrement())
   Note String
   Commentaire String
   Date DateTime
@@ -76,7 +77,7 @@ model AvisEtRecommandention{
   UtilisateurId Int?
 }
 model Message{
-  Id Int @unique
+  Id Int @unique @default(autoincrement())
   Expediteur String
   Destinataire String
   Contenu String
@@ -88,7 +89,7 @@ model Message{
   UtilisateurId Int?
 }
 model Intervention{
-  Id Int @unique
+  Id Int @unique @default(autoincrement())
   Description String
   Statut String
   Date DateTime
@@ -98,12 +99,12 @@ model Intervention{
   UtilisateurId Int?
 }
 model Secteur{
-  Id Int @unique
+  Id Int @unique @default(autoincrement())
   Designation String 
   Appartenir Appartenir[]
 }
 model Appartenir{
-  Id Int @unique
+  Id Int @unique @default(autoincrement())
   Prestataire Prestataire? @relation(fields: [PrestataireId],references: [Id])
   PrestataireId Int?
   Secteur Secteur? @relation(fields: [SecteurId],references: [Id])
