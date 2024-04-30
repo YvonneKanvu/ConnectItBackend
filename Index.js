@@ -109,6 +109,55 @@ app.post("/geolocalisation", async (req, res) => {
   }
 });
 
+// modification de prestataire
+app.put("/prestataire/:id", async (req, res) => {
+  // const { id } = req.params; // Récupérer l'ID du prestataire à mettre à jour depuis l'URL
+  const { Nom, PreNom, Adesse, Email, Telephone, Secteur, NomDeL_entreprise, GeolocalisationId, id } = req.body; // Récupérer les données de la requête
+
+  try {
+    const updatedPrestataire = await prisma.prestataire.update({
+      where: { id: id },
+      data: {
+        Nom: Nom,
+        PreNom: PreNom,
+        Adesse: Adesse,
+        Email: Email,
+        Telephone: Telephone,
+        Secteur: Secteur,
+        NomDeL_entreprise: NomDeL_entreprise,
+        GeolocalisationId: 1
+      },
+    });
+
+    res.status(200).json({
+      message: 'Prestataire mis à jour avec succès',
+      prestataire: updatedPrestataire
+    });
+  } catch (error) {
+    console.error("Error updating prestataire:", error);
+    res.status(500).json({ error: 'Une erreur s\'est produite lors de la mise à jour du prestataire' });
+  }
+});
+// app.put("/prestataire/:id", async (req, res) => {
+// const updatedPrestataire = await prisma.prestataire.update({
+//   where: { id: 1 },
+//   data: {
+    
+//     Nom: Nom,
+//     PreNom: PreNom,
+//     Adesse: Adesse,
+//     Email: Email,
+//     Telephone: Telephone,
+//     Secteur: Secteur,
+//     NomDeL_entreprise: NomDeL_entreprise,
+//     GeolocalisationId: GeolocalisationId
+//   },
+// });
+// res.status(200).json({
+//   message: 'Prestataire mis à jour avec succès',
+//   prestataire: updatedPrestataire
+// });
+// });
 
 app.listen(PORT,() => {
     console.log(`le Serveur ecoute sur le port ${PORT}`)
