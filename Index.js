@@ -111,7 +111,6 @@ app.post("/geolocalisation", async (req, res) => {
 
 // modification de prestataire
 app.put("/prestataire/:id", async (req, res) => {
-  // const { id } = req.params; // Récupérer l'ID du prestataire à mettre à jour depuis l'URL
   const { Nom, PreNom, Adesse, Email, Telephone, Secteur, NomDeL_entreprise, GeolocalisationId, id } = req.body; // Récupérer les données de la requête
 
   try {
@@ -138,26 +137,21 @@ app.put("/prestataire/:id", async (req, res) => {
     res.status(500).json({ error: 'Une erreur s\'est produite lors de la mise à jour du prestataire' });
   }
 });
-// app.put("/prestataire/:id", async (req, res) => {
-// const updatedPrestataire = await prisma.prestataire.update({
-//   where: { id: 1 },
-//   data: {
-    
-//     Nom: Nom,
-//     PreNom: PreNom,
-//     Adesse: Adesse,
-//     Email: Email,
-//     Telephone: Telephone,
-//     Secteur: Secteur,
-//     NomDeL_entreprise: NomDeL_entreprise,
-//     GeolocalisationId: GeolocalisationId
-//   },
-// });
-// res.status(200).json({
-//   message: 'Prestataire mis à jour avec succès',
-//   prestataire: updatedPrestataire
-// });
-// });
+// supprimer un prestataire
+app.delete("/prestataire/:id", async (req, res) => {
+  const id = parseInt(req.params.id); 
+
+  try {
+    await prisma.prestataire.delete({
+      where: { id: id }, // Specifier l'ID du prestataire
+    });
+
+    res.status(200).json({ message: "Prestataire supprimé avec succès" });
+  } catch (error) {
+    console.error("Erreur suppression prestataire:", error);
+    res.status(500).json({ error: "Une erreur s'est produite lors de la suppression du prestataire" });
+  }
+});
 
 app.listen(PORT,() => {
     console.log(`le Serveur ecoute sur le port ${PORT}`)
