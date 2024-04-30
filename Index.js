@@ -12,7 +12,7 @@ app.get("/", (req, res) => {
 // liste prestataires
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient(); 
-// const { Int } = require('@prisma/client/runtime'); 
+
 
  app.get("/prestataires", async (req, res) => {
     try {
@@ -49,10 +49,35 @@ app.get("/prestataire/:Id", async (req, res) => {
 app.get("/prestataire/:localisation", async (req, res) => {
    res.json({ message: "Recherche par géolocalisation pas encore implémentée" });
  });
-//  ajouter un prestataire
+
+//  ajouter Geolocalisation
+app.post("/geolocalisation", async (req, res) => {
+  try {
+    
+    const {Adresse, Laltitude, Longitude} = req.body;
+
+    const createdGeolocalisation = await prisma.geolocalisation.create({
+      data: 
+        { 
+        Adresse : Adresse,
+        Laltitude  : Laltitude,
+        Longitude : Longitude,
+
+        }
+    });
+    res.status(201).json({
+      message: 'Geolocalisation créé avec succès',
+      Geolocalisation: createdGeolocalisation
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Erreur lors de la création du Geolocalisation'});
+  }
+});
+// ajouter prestataire
  app.post("/prestataire", async (req, res) => {
   try {
-    const { Nom, PreNom, Adesse, Email, Telephone, Secteur,Id, NomDeL_entreprise, Geolocalisation} = req.body;
+    const { Nom, PreNom, Adesse, Email, Telephone, Secteur, NomDeL_entreprise, Adresse, GeolocalisationId} = req.body;
 
     const createdPrestataire = await prisma.prestataire.create({
       data: 
@@ -63,9 +88,15 @@ app.get("/prestataire/:localisation", async (req, res) => {
           Email: Email,
           Telephone: Telephone,
           Secteur: Secteur,
-          Id : Id,
           NomDeL_entreprise :NomDeL_entreprise,
-          Geolocalisation : Geolocalisation
+          GeolocalisationId : GeolocalisationId
+          // Geolocalisation: {
+          //   create: {
+          //     Adresse: Adresse.ligne,
+          //     Laltitude: Adresse.lat,
+          //     Longitude: Adresse.long
+          //   }
+          // }
         }
     });
     res.status(201).json({
@@ -77,6 +108,7 @@ app.get("/prestataire/:localisation", async (req, res) => {
     res.status(500).json({ message: 'Erreur lors de la création du prestataire'});
   }
 });
+
 
 app.listen(PORT,() => {
     console.log(`le Serveur ecoute sur le port ${PORT}`)

@@ -13,13 +13,13 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 model Prestataire{
-  Id Int @unique @default(autoincrement())
+  id Int @id @default(autoincrement())
   Nom String
   PreNom String
   Adesse String
   Email String
   Telephone String
-  Geolocalisation Geolocalisation @relation(fields: [GeolocalisationId],references: [Id])
+  Geolocalisation Geolocalisation @relation(fields: [GeolocalisationId],references: [id])
   GeolocalisationId Int
   Secteur String
   NomDeL_entreprise String
@@ -31,10 +31,10 @@ model Prestataire{
   Appartenir Appartenir[]
 }
 model Geolocalisation{
-  Id Int @unique @default(autoincrement())
+  id Int @id @default(autoincrement())
   Adresse String
-  Laltitude String
-  Longitude String
+  Laltitude Float
+  Longitude Float
   Prestataire Prestataire[]
 }
 model Utilisateur{
@@ -51,7 +51,7 @@ model Utilisateur{
 }
 model Fournir{
   Id Int @unique @default(autoincrement())
-  Prestataire Prestataire? @relation(fields: [PrestataireId],references: [Id])
+  Prestataire Prestataire? @relation(fields: [PrestataireId],references: [id])
   PrestataireId Int?
   Utilisateur Utilisateur? @relation(fields: [UtilisateurId],references: [Id])
   UtilisateurId Int?
@@ -61,7 +61,7 @@ model DemandeDeDevis{
   TypeDeService String
   Statut String
   Date DateTime
-  Prestataire Prestataire? @relation(fields: [PrestataireId],references: [Id])
+  Prestataire Prestataire? @relation(fields: [PrestataireId],references: [id])
   PrestataireId Int?
   Utilisateur Utilisateur? @relation(fields: [UtilisateurId],references: [Id])
   UtilisateurId Int?
@@ -71,7 +71,7 @@ model AvisEtRecommandention{
   Note String
   Commentaire String
   Date DateTime
-  Prestataire Prestataire? @relation(fields: [PrestataireId],references: [Id])
+  Prestataire Prestataire? @relation(fields: [PrestataireId],references: [id])
   PrestataireId Int?
   Utilisateur Utilisateur? @relation(fields: [UtilisateurId],references: [Id])
   UtilisateurId Int?
@@ -83,7 +83,7 @@ model Message{
   Contenu String
   Statut String
   Date DateTime
-  Prestataire Prestataire? @relation(fields: [PrestataireId],references: [Id])
+  Prestataire Prestataire? @relation(fields: [PrestataireId],references: [id])
   PrestataireId Int?
   Utilisateur Utilisateur? @relation(fields: [UtilisateurId],references: [Id])
   UtilisateurId Int?
@@ -93,7 +93,7 @@ model Intervention{
   Description String
   Statut String
   Date DateTime
-  Prestataire Prestataire? @relation(fields: [PrestataireId],references: [Id])
+  Prestataire Prestataire? @relation(fields: [PrestataireId],references: [id])
   PrestataireId Int?
   Utilisateur Utilisateur? @relation(fields: [UtilisateurId],references: [Id])
   UtilisateurId Int?
@@ -105,7 +105,7 @@ model Secteur{
 }
 model Appartenir{
   Id Int @unique @default(autoincrement())
-  Prestataire Prestataire? @relation(fields: [PrestataireId],references: [Id])
+  Prestataire Prestataire? @relation(fields: [PrestataireId],references: [id])
   PrestataireId Int?
   Secteur Secteur? @relation(fields: [SecteurId],references: [Id])
   SecteurId Int?
