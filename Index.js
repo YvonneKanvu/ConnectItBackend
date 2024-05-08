@@ -1,18 +1,23 @@
 const express = require("express");
-const PORT = 3000;
+const PORT = 3001;
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient(); 
 
+const bcrypt =require("bcrypt")
 const app = express();
 app.use(express.json());
+app.use(
+  express.urlencoded({
+    extended: true,
+  })  
+);  
 
 //console sur le navigateur
 app.get("/", (req, res) => {
     res.send("L'application fonctionne")
-  });
+  });  
 
-// liste prestataires
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient(); 
-
+// liste prestataires  
 
  app.get("/prestataires", async (req, res) => {
     try {
@@ -90,13 +95,7 @@ app.post("/geolocalisation", async (req, res) => {
           Secteur: Secteur,
           NomDeL_entreprise :NomDeL_entreprise,
           GeolocalisationId : GeolocalisationId
-          // Geolocalisation: {
-          //   create: {
-          //     Adresse: Adresse.ligne,
-          //     Laltitude: Adresse.lat,
-          //     Longitude: Adresse.long
-          //   }
-          // }
+          
         }
     });
     res.status(201).json({
@@ -152,6 +151,49 @@ app.delete("/prestataire/:id", async (req, res) => {
     res.status(500).json({ error: "Une erreur s'est produite lors de la suppression du prestataire" });
   }
 });
+// créer un utilisateur
+app.post("/utilisateur", async (req, res) => {
+   // console.log(req.body)
+
+//     const createdUtilisateur = await prisma.utilisateur.create({
+//       data: 
+//         {
+//           Nom: Nom,
+//           PreNom: PreNom,
+//           Adesse: Adesse,
+//           Email: Email,
+//           Telephone: Telephone,
+          
+//         }
+//     });
+//     res.status(201).json({
+//       message: 'utilisateur créé avec succès',
+//       prestataire: createdUtilisateur
+//     });
+res.json({message : "success"})
+});
+
+
+app.post("/user/create",async (req, res)=> {
+const {prenom, nom, email, telephone, password} = req.body
+  console.log(prenom, nom, email, telephone, password)
+const saltgen = bcrypt.genSaltSync(12)
+const passwordHash = bcrypt.hashSync(password, saltgen)
+const user = await prisma.utilisateur.create({
+ data: {
+  nom,
+  prenom,
+  email,
+  telephone,
+  password :passwordHash,
+ } 
+})
+
+  res.json({user})
+})
+
+
+
 
 app.listen(PORT,() => {
     console.log(`le Serveur ecoute sur le port ${PORT}`)
