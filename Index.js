@@ -1,6 +1,6 @@
 
 const express = require("express");
-const PORT = 3003;
+const PORT = 3000;
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient(); 
 const jwt = require('jsonwebtoken');
@@ -41,50 +41,51 @@ app.use(
 //   }
 // });
 
-// créer un utilisateur
-// app.post("/utilisateur", async (req, res) => {
-// res.json({message : "success"})
-// });
+if (!process.env.SECRET_KEY) {
+  console.error("SECRET_KEY n'est pas défini dans les variables d'environnement");
+  process.exit(1);
+}
 
 
-// app.post("/user/create",async (req, res)=> {
-// const {prenom, nom, email, telephone, password} = req.body
-// // try{
-// // Vérification si l'e-mail existe déjà dans la base de données
-// // const existingUser = await prisma.utilisateur.findUnique({
-// //   where: { email },
-// // });
+ app.post("/user/create",async (req, res)=> {
+ const {prenom, nom, email, telephone, password} = req.body
+ try{
+  // Vérification si l'e-mail existe déjà dans la base de données
+ const existingUser = await prisma.utilisateur.findFirst({
+    where: { 
+      email: email
+     },
+ });
+  if (existingUser) {
+   return res.status(400).json({ message: "Cet email existe déjà" });
+   }
+console.log(prenom, nom, email, telephone, password)
+ const saltgen = bcrypt.genSaltSync(12)
+ const passwordHash = bcrypt.hashSync(password, saltgen)
+ // Création de l'utilisateur dans la base de données
+ const user = await prisma.utilisateur.create({
+  data: {
+   nom,
+   prenom,
+   email,
+  telephone,
+   password :passwordHash,
+  } 
+ })
+  //  res.json({user})
+ const token = jwt.sign({ userId: user.id }, process.env.SECRET_KEY)
+return res.status(201).json({
+   message: "Utilisateur enregistré avec succès",
+  token,
+   user,
+ });
+ } catch (error) {
+ console.error("Error creating user:", error);
+ return res.status(500).json({ error: "Une erreur est survenue lors de la création de l'utilisateur" });
+ }
+ });
 
-// // if (existingUser) {
-// //   return res.status(400).json({ message: "Cet email existe déjà" });
-// // }
-// console.log(prenom, nom, email, telephone, password)
-// const saltgen = bcrypt.genSaltSync(12)
-// const passwordHash = bcrypt.hashSync(password, saltgen)
-//  // Création de l'utilisateur dans la base de données
-// const user = await prisma.utilisateur.create({
-//  data: {
-//   nom,
-//   prenom,
-//   email,
-//   telephone,
-//   password :passwordHash,
-//  } 
-// })
 
-//   res.json({user})
-
-// const token = jwt.sign({ userId: user.id }, process.env.SECRET_KEY)
-// return res.status(201).json({
-//   message: "Utilisateur enregistré avec succès",
-//   token,
-//   user,
-// });
-// } catch (error) {
-// console.error("Error creating user:", error);
-// return res.status(500).json({ error: "Une erreur est survenue lors de la création de l'utilisateur" });
-// }
-  // });
 
   //  Route de connexion
 // console.log('SECRET_KEY:', process.env.SECRET_KEY);
