@@ -1,8 +1,11 @@
+
 const express = require("express");
-const PORT = 3001;
+const PORT = 3003;
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient(); 
-
+const jwt = require('jsonwebtoken');
+const dotenv = require("dotenv");
+dotenv.config();
 const bcrypt =require("bcrypt")
 const app = express();
 app.use(express.json());
@@ -11,186 +14,110 @@ app.use(
     extended: true,
   })  
 );  
+// console.log(process.env.SECRET_KEY);
 
-//console sur le navigateur
-app.get("/", (req, res) => {
-    res.send("L'application fonctionne")
-  });  
-
-// liste prestataires  
-
- app.get("/prestataires", async (req, res) => {
-    try {
-     const prestataires = await prisma.prestataire.findMany();
-    res.json(prestataires);
-   } catch (error) {
-    console.error(error);
-   res.status(500).send("Error retrieving prestataires");
-   }
- });
-  
- // prestataire par ID
-app.get("/prestataire/:Id", async (req, res) => {
-
-   const Id =  parseInt(req.params.Id);
-   try {
-    const prestataire = await prisma.prestataire.findUnique({
-      where: {
-       Id: Id,
-     },
-    });
-    if (!prestataire) {
-        res.status(404).send("Prestataire not found");
-       return;
-     }
-     res.json(prestataire);
-   } catch (error) {
-     console.error(error);
-     res.status(500).send("Error server");
-   }
-  });
-  
- // prestataire par geolocalisation
-app.get("/prestataire/:localisation", async (req, res) => {
-   res.json({ message: "Recherche par géolocalisation pas encore implémentée" });
- });
-
-//  ajouter Geolocalisation
-app.post("/geolocalisation", async (req, res) => {
-  try {
+// //  ajouter Geolocalisation
+// app.post("/geolocalisation", async (req, res) => {
+//   try {
     
-    const {Adresse, Laltitude, Longitude} = req.body;
+//     const {Adresse, Laltitude, Longitude} = req.body;
 
-    const createdGeolocalisation = await prisma.geolocalisation.create({
-      data: 
-        { 
-        Adresse : Adresse,
-        Laltitude  : Laltitude,
-        Longitude : Longitude,
-
-        }
-    });
-    res.status(201).json({
-      message: 'Geolocalisation créé avec succès',
-      Geolocalisation: createdGeolocalisation
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Erreur lors de la création du Geolocalisation'});
-  }
-});
-// ajouter prestataire
- app.post("/prestataire", async (req, res) => {
-  try {
-    const { Nom, PreNom, Adesse, Email, Telephone, Secteur, NomDeL_entreprise, Adresse, GeolocalisationId} = req.body;
-
-    const createdPrestataire = await prisma.prestataire.create({
-      data: 
-        {
-          Nom: Nom,
-          PreNom: PreNom,
-          Adesse: Adesse,
-          Email: Email,
-          Telephone: Telephone,
-          Secteur: Secteur,
-          NomDeL_entreprise :NomDeL_entreprise,
-          GeolocalisationId : GeolocalisationId
-          
-        }
-    });
-    res.status(201).json({
-      message: 'Prestataire créé avec succès',
-      prestataire: createdPrestataire
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Erreur lors de la création du prestataire'});
-  }
-});
-
-// modification de prestataire
-app.put("/prestataire/:id", async (req, res) => {
-  const { Nom, PreNom, Adesse, Email, Telephone, Secteur, NomDeL_entreprise, GeolocalisationId, id } = req.body; // Récupérer les données de la requête
-
-  try {
-    const updatedPrestataire = await prisma.prestataire.update({
-      where: { id: id },
-      data: {
-        Nom: Nom,
-        PreNom: PreNom,
-        Adesse: Adesse,
-        Email: Email,
-        Telephone: Telephone,
-        Secteur: Secteur,
-        NomDeL_entreprise: NomDeL_entreprise,
-        GeolocalisationId: 1
-      },
-    });
-
-    res.status(200).json({
-      message: 'Prestataire mis à jour avec succès',
-      prestataire: updatedPrestataire
-    });
-  } catch (error) {
-    console.error("Error updating prestataire:", error);
-    res.status(500).json({ error: 'Une erreur s\'est produite lors de la mise à jour du prestataire' });
-  }
-});
-// supprimer un prestataire
-app.delete("/prestataire/:id", async (req, res) => {
-  const id = parseInt(req.params.id); 
-
-  try {
-    await prisma.prestataire.delete({
-      where: { id: id }, // Specifier l'ID du prestataire
-    });
-
-    res.status(200).json({ message: "Prestataire supprimé avec succès" });
-  } catch (error) {
-    console.error("Erreur suppression prestataire:", error);
-    res.status(500).json({ error: "Une erreur s'est produite lors de la suppression du prestataire" });
-  }
-});
-// créer un utilisateur
-app.post("/utilisateur", async (req, res) => {
-   // console.log(req.body)
-
-//     const createdUtilisateur = await prisma.utilisateur.create({
+//     const createdGeolocalisation = await prisma.geolocalisation.create({
 //       data: 
-//         {
-//           Nom: Nom,
-//           PreNom: PreNom,
-//           Adesse: Adesse,
-//           Email: Email,
-//           Telephone: Telephone,
-          
+//         { 
+//         Adresse : Adresse,
+//         Laltitude  : Laltitude,
+//         Longitude : Longitude,
+
 //         }
 //     });
 //     res.status(201).json({
-//       message: 'utilisateur créé avec succès',
-//       prestataire: createdUtilisateur
+//       message: 'Geolocalisation créé avec succès',
+//       Geolocalisation: createdGeolocalisation
 //     });
-res.json({message : "success"})
-});
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: 'Erreur lors de la création du Geolocalisation'});
+//   }
+// });
+
+// créer un utilisateur
+// app.post("/utilisateur", async (req, res) => {
+// res.json({message : "success"})
+// });
 
 
-app.post("/user/create",async (req, res)=> {
-const {prenom, nom, email, telephone, password} = req.body
-  console.log(prenom, nom, email, telephone, password)
-const saltgen = bcrypt.genSaltSync(12)
-const passwordHash = bcrypt.hashSync(password, saltgen)
-const user = await prisma.utilisateur.create({
- data: {
-  nom,
-  prenom,
-  email,
-  telephone,
-  password :passwordHash,
- } 
-})
+// app.post("/user/create",async (req, res)=> {
+// const {prenom, nom, email, telephone, password} = req.body
+// // try{
+// // Vérification si l'e-mail existe déjà dans la base de données
+// // const existingUser = await prisma.utilisateur.findUnique({
+// //   where: { email },
+// // });
 
-  res.json({user})
-})
+// // if (existingUser) {
+// //   return res.status(400).json({ message: "Cet email existe déjà" });
+// // }
+// console.log(prenom, nom, email, telephone, password)
+// const saltgen = bcrypt.genSaltSync(12)
+// const passwordHash = bcrypt.hashSync(password, saltgen)
+//  // Création de l'utilisateur dans la base de données
+// const user = await prisma.utilisateur.create({
+//  data: {
+//   nom,
+//   prenom,
+//   email,
+//   telephone,
+//   password :passwordHash,
+//  } 
+// })
+
+//   res.json({user})
+
+// const token = jwt.sign({ userId: user.id }, process.env.SECRET_KEY)
+// return res.status(201).json({
+//   message: "Utilisateur enregistré avec succès",
+//   token,
+//   user,
+// });
+// } catch (error) {
+// console.error("Error creating user:", error);
+// return res.status(500).json({ error: "Une erreur est survenue lors de la création de l'utilisateur" });
+// }
+  // });
+
+  //  Route de connexion
+// console.log('SECRET_KEY:', process.env.SECRET_KEY);
+//  if (!process.env.SECRET_KEY) {
+//   console.error('SECRET_KEY n\'est pas défini dans les variables d\'environnement');
+//  process.exit(1);
+//    }
+app.post("/login", async (req, res) => {
+   const { email, password } = req.body;
+    try{
+      const Utilisateur = await prisma.utilisateur.findFirst({
+        where: { 
+          email: email
+       }
+      });
+   console.log(Utilisateur);
+      if (!Utilisateur) {
+        return res.status(401).json({ message: "Identifiants incorrects" });
+     }
+     const isPasswordValid = await bcrypt.compare(password, Utilisateur.password);
+    if (!isPasswordValid) {
+     return res.status(401).json({ message: "Identifiants incorrects" });
+     }
+  
+      const token = jwt.sign({ UtilisateurId: Utilisateur.id }, process.env.SECRET_KEY);
+  
+    res.status(200).json({ message: "Connexion réussie", token });
+    } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Erreur interne du serveur" });
+  }
+ });
+
 
 
 
@@ -198,6 +125,5 @@ const user = await prisma.utilisateur.create({
 app.listen(PORT,() => {
     console.log(`le Serveur ecoute sur le port ${PORT}`)
 })
-
 
 
