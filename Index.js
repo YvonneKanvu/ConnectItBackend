@@ -1,6 +1,6 @@
 
 const express = require("express");
-const PORT = 3000;
+const PORT = 3003;
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient(); 
 const jwt = require('jsonwebtoken');
@@ -14,6 +14,8 @@ app.use(
     extended: true,
   })  
 );  
+const { body, validationResult } = require('express-validator');
+
 // console.log(process.env.SECRET_KEY);
 
 // //  ajouter Geolocalisation
@@ -46,8 +48,25 @@ if (!process.env.SECRET_KEY) {
   process.exit(1);
 }
 
+// Validation middleware pour la  creation de l'utilisateur
+const validateUserCreation = [
+  body('prenom').notEmpty().withMessage('Prenom is required'),
+  body('nom').notEmpty().withMessage('Nom is required'),
+  body('email').isEmail().withMessage('Email is invalid'),
+  body('telephone').notEmpty().withMessage('Telephone is required'),
+  body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long'),
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    next();
+  }
+];
 
- app.post("/user/create",async (req, res)=> {
+
+// creation de compte
+ app.post("/user/create", validateUserCreation, async (req, res)=> {
  const {prenom, nom, email, telephone, password} = req.body
  try{
   // Vérification si l'e-mail existe déjà dans la base de données
@@ -72,7 +91,6 @@ console.log(prenom, nom, email, telephone, password)
    password :passwordHash,
   } 
  })
-  //  res.json({user})
  const token = jwt.sign({ userId: user.id }, process.env.SECRET_KEY)
 return res.status(201).json({
    message: "Utilisateur enregistré avec succès",
@@ -88,11 +106,6 @@ return res.status(201).json({
 
 
   //  Route de connexion
-// console.log('SECRET_KEY:', process.env.SECRET_KEY);
-//  if (!process.env.SECRET_KEY) {
-//   console.error('SECRET_KEY n\'est pas défini dans les variables d\'environnement');
-//  process.exit(1);
-//    }
 app.post("/login", async (req, res) => {
    const { email, password } = req.body;
     try{
@@ -118,6 +131,32 @@ app.post("/login", async (req, res) => {
     res.status(500).json({ message: "Erreur interne du serveur" });
   }
  });
+
+ // Authentication middleware
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (token == null) return res.sendStatus(401);
+
+  jwt.verify(token, process.env.SECRET_KEY, (err, user) => {
+    if (err) return res.sendStatus(403);
+    req.user = user;
+    next();
+  });
+};
+
+// Protection route 
+app.get("/protected", authenticateToken, (req, res) => {
+  res.json({ message: " protection de route", user: req.user });
+});
+
+
+// erreur middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: "erreur interne de serveur" });
+});
 
 
 
