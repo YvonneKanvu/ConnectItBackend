@@ -1,13 +1,13 @@
 
 // const express = require("express");
 // const PORT = 3003;
-// const cors = require('cors');
+// // const cors = require('cors');
 // const { PrismaClient } = require('@prisma/client');
 // const prisma = new PrismaClient(); 
 // const jwt = require('jsonwebtoken');
 // const dotenv = require("dotenv");
 // dotenv.config();
-// app.use(cors());
+// // app.use(cors());
 // const bcrypt =require("bcrypt")
 // const app = express();
 // app.use(express.json());
@@ -148,38 +148,24 @@
 //   });
 // };
 
-// // Protection route 
-// app.get("/protected", authenticateToken, (req, res) => {
-//   res.json({ message: " protection de route", user: req.user });
-// });
 
-
-// // erreur middleware
-// app.use((err, req, res, next) => {
-//   console.error(err.stack);
-//   res.status(500).json({ error: "erreur interne de serveur" });
-// });
-
-
-// app.listen(PORT,() => {
-//     console.log(`le Serveur ecoute sur le port ${PORT}`)
-// })
 
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const authRoutes = require('./routeAuthentification');
 const authenticateToken = require('./authMiddleware');
+const app = express();
+
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(cors());
+dotenv.config();
 console.log(authenticateToken);
 
-dotenv.config();
 
-const app = express();
 const PORT = process.env.PORT || 3003;
 
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
 app.use('/routeAuthentification', authRoutes);
 
