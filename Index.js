@@ -170,12 +170,12 @@ const PORT = process.env.PORT || 3003;
 app.use('/auth', authRoutes);
 app.use('/auth', loginRouter); // Monte le loginRouter sur '/auth'
 
-// Routes protégées pour l'utilisateur
-app.use(authenticateToken); // Utilise le middleware pour protéger les routes suivantes
-app.use('/user', userRoutes); // Monte les routes utilisateur sur '/user'
+// // Routes protégées pour l'utilisateur
+// app.use(authenticateToken); // Utilise le middleware pour protéger les routes suivantes
+// app.use('/user', userRoutes); // Monte les routes utilisateur sur '/user'
 
 // Routes protégées
-app.use('/protected', authenticateToken, userRoutes);
+app.use('/user', authenticateToken, userRoutes);
 
 // Route de test pour vérifier la protection des routes
 app.get('/protected', authenticateToken, (req, res) => {

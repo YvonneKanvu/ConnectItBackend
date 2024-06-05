@@ -42,15 +42,10 @@ router.post("/user/create", validateUserCreation, async (req, res) => {
     const user = await prisma.utilisateur.create({
       data: { prenom, nom, email, telephone, password: passwordHash },
     });
-
-    const token = jwt.sign({ userId: user.id }, process.env.SECRET_KEY);
+    // const token = jwt.sign({ UtilisateurId: Utilisateur.id }, process.env.SECRET_KEY);
+     const token = jwt.sign({ UtilisteurId: user.id }, process.env.SECRET_KEY);
+    console.log("Token généré:", token); 
     return res.status(201).json({ message: "Utilisateur enregistré avec succès", token, user });
-  // } catch (error) {
-  //   if (error.response) {
-  //     console.error('Erreur lors de la création du compte:', error.response.data);
-  //   } else {
-  //     console.error('Erreur de connexion au serveur:', error.message);
-  //   }
    } catch (error) {
     console.error("Error creating user:", error);
     return res.status(500).json({ error: "Une erreur est survenue lors de la création de l'utilisateur" });
