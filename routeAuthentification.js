@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
+const authenticateToken = require('./authMiddleware'); 
 // const prisma = require('../prisma/prisma')
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
@@ -24,6 +25,7 @@ const validateUserCreation = [
   }
 ];
 
+// cretion de compte
 router.post("/user/create", validateUserCreation, async (req, res) => {
   const { prenom, nom, email, telephone, password } = req.body;
   try {
@@ -55,27 +57,5 @@ router.post("/user/create", validateUserCreation, async (req, res) => {
   }
 });
 
-router.post("/login", async (req, res) => {
-    const { email, password } = req.body;
-    try {
-      const Utilisateur = await prisma.utilisateur.findFirst({
-        where: { email },
-      });
-      if (!Utilisateur) {
-        return res.status(401).json({ message: "Identifiants incorrects" });
-      }
-  
-      const isPasswordValid = await bcrypt.compare(password, Utilisateur.password);
-      if (!isPasswordValid) {
-        return res.status(401).json({ message: "Identifiants incorrects" });
-      }
-  
-      const token = jwt.sign({ userId: Utilisateur.id }, process.env.SECRET_KEY);
-      res.status(200).json({ message: "Connexion réussie", token });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: "Erreur interne du serveur" });
-    }
-  });
   module.exports = router;
   

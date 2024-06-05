@@ -154,25 +154,38 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const authRoutes = require('./routeAuthentification');
+const userRoutes = require('./userRoutes');
+const loginRouter = require('./loginRouter'); 
 const authenticateToken = require('./authMiddleware');
 const app = express();
 
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-app.use(cors());
 dotenv.config();
-console.log(authenticateToken);
-
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cors());
 
 const PORT = process.env.PORT || 3003;
 
+// Routes d'authentification (Utilisation d'un seul chemin)
+app.use('/auth', authRoutes);
+app.use('/auth', loginRouter); // Monte le loginRouter sur '/auth'
 
-app.use('/routeAuthentification', authRoutes);
+// Routes protégées pour l'utilisateur
+app.use(authenticateToken); // Utilise le middleware pour protéger les routes suivantes
+app.use('/user', userRoutes); // Monte les routes utilisateur sur '/user'
 
+// Routes protégées
+app.use('/protected', authenticateToken, userRoutes);
+
+// Route de test pour vérifier la protection des routes
 app.get('/protected', authenticateToken, (req, res) => {
   res.json({ message: 'Protection de route', user: req.user });
 });
 
+// Routes page utilisateur
+app.use('/userRoutes', userRoutes);
+
+// Middleware de gestion des erreurs
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ error: 'Erreur interne du serveur' });
