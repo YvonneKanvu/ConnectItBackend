@@ -153,10 +153,10 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
-const authRoutes = require('./routeAuthentification');
-const userRoutes = require('./userRoutes');
-const loginRouter = require('./loginRouter'); 
-const authenticateToken = require('./authMiddleware');
+const authRoutes = require('../routeAuthentification');
+const userRoutes = require('../userRoutes');
+const loginRouter = require('../mesRoutes/loginRouter'); 
+const authenticateToken = require('../authMiddleware');
 const app = express();
 
 dotenv.config();
