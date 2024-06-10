@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
-const authenticateToken = require('./authMiddleware'); 
+const authenticateToken = require('../authMiddleware'); 
 
 // Route protégée pour obtenir les données utilisateur
 router.get("/userPage", authenticateToken, async (req, res) => {
