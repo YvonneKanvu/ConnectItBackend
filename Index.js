@@ -171,8 +171,8 @@ app.use('/auth', authRoutes);
 app.use('/auth', loginRouter); // Monte le loginRouter sur '/auth'
 
 // // Routes protégées pour l'utilisateur
-// app.use(authenticateToken); // Utilise le middleware pour protéger les routes suivantes
-// app.use('/user', userRoutes); // Monte les routes utilisateur sur '/user'
+// app.use(authenticateToken); 
+// app.use('/user', userRoutes); 
 
 // Routes protégées
 app.use('/user', authenticateToken, userRoutes);
