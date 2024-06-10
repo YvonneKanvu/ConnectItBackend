@@ -166,6 +166,11 @@ app.use(cors());
 
 const PORT = process.env.PORT || 3003;
 
+// Route de base
+app.get('/', (req, res) => {
+  res.send('Bienvenue sur MyConnectItb');
+});
+
 // Routes d'authentification (Utilisation d'un seul chemin)
 app.use('/auth', authRoutes);
 app.use('/auth', loginRouter); // Monte le loginRouter sur '/auth'
